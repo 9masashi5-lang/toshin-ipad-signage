@@ -115,10 +115,12 @@ export async function updateSignage(patch: StatePatch) {
     return;
   }
   const { db } = getFirebaseServices();
-  const { updatedAt: _cachedUpdatedAt, ...completeState } = next;
-  void _cachedUpdatedAt;
-  await setDoc(doc(db, CURRENT_DOCUMENT), {
-    ...completeState,
-    updatedAt: serverTimestamp(),
-  });
+  await setDoc(
+    doc(db, CURRENT_DOCUMENT),
+    {
+      ...patch,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true },
+  );
 }

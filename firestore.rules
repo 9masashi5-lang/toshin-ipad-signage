@@ -59,9 +59,15 @@ service cloud.firestore {
       return request.resource.data.keys().hasOnly([
           'mode', 'ranking', 'rankingSlides', 'notice', 'countdown', 'updatedAt'
         ])
+        && request.resource.data.keys().hasAll([
+          'mode', 'ranking', 'notice', 'countdown', 'updatedAt'
+        ])
         && request.resource.data.mode in ['ranking', 'notice', 'countdown']
         && isValidRanking(request.resource.data.ranking)
-        && hasValidRankingSlides(request.resource.data.rankingSlides)
+        && (
+          !request.resource.data.keys().hasAny(['rankingSlides'])
+          || hasValidRankingSlides(request.resource.data.rankingSlides)
+        )
         && request.resource.data.notice is map
         && request.resource.data.notice.keys().hasOnly(['title', 'message'])
         && request.resource.data.notice.title is string
