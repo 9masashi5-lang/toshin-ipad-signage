@@ -1,8 +1,37 @@
 "use client";
 
+import { FirebaseError } from "firebase/app";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { getFirebaseServices, isDemoMode, isFirebaseConfigured } from "@/lib/firebase";
+
+function getLoginErrorMessage(error: unknown): string {
+  if (!(error instanceof FirebaseError)) {
+    return "ログイン処理中に予期しないエラーが発生しました。";
+  }
+
+  switch (error.code) {
+    case "auth/invalid-credential":
+    case "auth/invalid-email":
+    case "auth/user-not-found":
+    case "auth/wrong-password":
+      return "メールアドレスまたはパスワードを確認してください。";
+    case "auth/user-disabled":
+      return "この管理者アカウントは無効になっています。";
+    case "auth/too-many-requests":
+      return "ログイン試行回数が多すぎます。しばらく待ってから再度お試しください。";
+    case "auth/network-request-failed":
+      return "Firebaseへ接続できませんでした。通信環境やブラウザの設定を確認してください。";
+    case "auth/operation-not-allowed":
+      return "Firebaseでメール／パスワード認証が有効になっていません。";
+    case "auth/unauthorized-domain":
+      return "このドメインはFirebase Authenticationで承認されていません。";
+    case "auth/invalid-api-key":
+      return "Firebase APIキーが正しくありません。Vercelの環境変数を確認してください。";
+    default:
+      return `ログインできませんでした（${error.code}）。`;
+  }
+}
 
 export function AuthGate({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -58,8 +87,9 @@ export function AuthGate({ children }: { children: ReactNode }) {
       setError("");
       try {
         await signInWithEmailAndPassword(getFirebaseServices().auth, email.trim(), password);
-      } catch {
-        setError("メールアドレスまたはパスワードを確認してください。");
+      } catch (caughtError) {
+        console.error("Firebase sign-in failed", caughtError);
+        setError(getLoginErrorMessage(caughtError));
       } finally {
         setSubmitting(false);
       }
