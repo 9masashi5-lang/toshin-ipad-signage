@@ -4,7 +4,13 @@ import { useMemo, useState } from "react";
 import { SignageCanvas } from "@/components/display/signage-canvas";
 import { useSignage } from "@/hooks/use-signage";
 import { updateSignage } from "@/lib/signage-store";
-import type { CountdownContent, NoticeContent, RankingContent, SignageMode } from "@/types/signage";
+import {
+  rankingBackgroundThemes,
+  type CountdownContent,
+  type NoticeContent,
+  type RankingContent,
+  type SignageMode,
+} from "@/types/signage";
 
 const modeLabels: Record<SignageMode, string> = {
   ranking: "ランキング",
@@ -69,6 +75,7 @@ function AdminDashboardContent({
         ...slides,
         {
           title: `ランキング ${slideNumber}`,
+          backgroundTheme: "navy",
           entries: [1, 2, 3].map((rank) => ({
             id: `slide-${uniqueId}-rank-${rank}`,
             name: "",
@@ -189,6 +196,25 @@ function AdminDashboardContent({
                       value={ranking.title}
                       onChange={(event) => updateRankingSlide(slideIndex, (slide) => ({ ...slide, title: event.target.value }))}
                     />
+                  </label>
+                  <label className="form-label mt-4">
+                    背景デザイン
+                    <select
+                      className="form-input"
+                      value={ranking.backgroundTheme}
+                      onChange={(event) =>
+                        updateRankingSlide(slideIndex, (slide) => ({
+                          ...slide,
+                          backgroundTheme: event.target.value as RankingContent["backgroundTheme"],
+                        }))
+                      }
+                    >
+                      {rankingBackgroundThemes.map((theme) => (
+                        <option key={theme.value} value={theme.value}>
+                          {theme.label}
+                        </option>
+                      ))}
+                    </select>
                   </label>
                   <div className="mt-5 space-y-3">
                     {ranking.entries.map((entry, entryIndex) => (

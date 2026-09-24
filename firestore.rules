@@ -34,8 +34,12 @@ service cloud.firestore {
 
     function isValidRanking(ranking) {
       return ranking is map
-        && ranking.keys().hasOnly(['title', 'entries'])
+        && ranking.keys().hasOnly(['title', 'backgroundTheme', 'entries'])
         && ranking.title is string
+        && (
+          !ranking.keys().hasAny(['backgroundTheme'])
+          || ranking.backgroundTheme in ['navy', 'blue', 'green', 'red', 'gold', 'light']
+        )
         && hasValidRankingEntries(ranking.entries);
     }
 

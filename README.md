@@ -10,6 +10,7 @@
 - `/display`：iPad横向き・常時表示向けサイネージ画面
 - 3つの表示モード：ランキング、重要なお知らせ、カウントダウン
 - 通常表示で複数のランキングスライドを10秒ごとに自動切替
+- ランキングスライドごとに6種類の背景デザインを選択
 - Firestore `onSnapshot` によるリアルタイム切替
 - Firebase Authentication（メールアドレス＋パスワード）
 - Firestore Security Rules による書き込み制限
@@ -82,12 +83,14 @@ signage/current
   rankingSlides: [
     {
       title: "今週のランキング",
+      backgroundTheme: "navy",
       entries: [
         { id: "rank-1", name: "山田さん", score: 1800 }
       ]
     },
     {
       title: "高速マスターランキング",
+      backgroundTheme: "green",
       entries: [
         { id: "slide-2-rank-1", name: "鈴木さん", score: 950 }
       ]
@@ -106,7 +109,7 @@ signage/current
 }
 ```
 
-`rankingSlides` は最大10枚です。`/display` は上から順に10秒ずつ表示します。既存データとの互換性のため `ranking` には第1スライドも保存します。古いデータに `rankingSlides` がない場合は、既存の `ranking` を自動的に第1スライドとして扱います。重要なお知らせとカウントダウンの操作は必要なフィールドだけを更新するため、一度表示すると「通常表示（ランキング）に戻す」を押すまで固定表示されます。
+`rankingSlides` は最大10枚です。`/display` は上から順に10秒ずつ表示します。各スライドの `backgroundTheme` には `navy`、`blue`、`green`、`red`、`gold`、`light` のいずれかを保存します。既存データとの互換性のため `ranking` には第1スライドも保存し、古いデータに `rankingSlides` や `backgroundTheme` がない場合は既存ランキングとネイビー背景を使用します。重要なお知らせとカウントダウンの操作は必要なフィールドだけを更新するため、一度表示すると「通常表示（ランキング）に戻す」を押すまで固定表示されます。
 
 管理者判定用ドキュメント：
 

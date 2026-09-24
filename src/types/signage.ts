@@ -1,7 +1,12 @@
 export type SignageMode = "ranking" | "notice" | "countdown";
+export type RankingBackgroundTheme = "navy" | "blue" | "green" | "red" | "gold" | "light";
 
 export type RankingEntry = { id: string; name: string; score: number };
-export type RankingContent = { title: string; entries: RankingEntry[] };
+export type RankingContent = {
+  title: string;
+  backgroundTheme: RankingBackgroundTheme;
+  entries: RankingEntry[];
+};
 export type NoticeContent = {
   title: string;
   message: string;
@@ -23,6 +28,7 @@ export type SignageState = {
 
 const defaultRanking: RankingContent = {
   title: "今週のランキング",
+  backgroundTheme: "navy",
   entries: [
     { id: "rank-1", name: "山田さん", score: 1800 },
     { id: "rank-2", name: "田中さん", score: 1600 },
@@ -46,6 +52,18 @@ export const defaultSignageState: SignageState = {
 };
 
 const modes: SignageMode[] = ["ranking", "notice", "countdown"];
+export const rankingBackgroundThemes: Array<{
+  value: RankingBackgroundTheme;
+  label: string;
+}> = [
+  { value: "navy", label: "ネイビー" },
+  { value: "blue", label: "ブルー" },
+  { value: "green", label: "グリーン" },
+  { value: "red", label: "レッド" },
+  { value: "gold", label: "ゴールド" },
+  { value: "light", label: "明るいホワイト" },
+];
+const rankingBackgroundThemeValues = rankingBackgroundThemes.map(({ value }) => value);
 
 export function normalizeSignageState(value: unknown): SignageState {
   if (!value || typeof value !== "object") return defaultSignageState;
@@ -90,6 +108,11 @@ function normalizeRanking(value: unknown, fallback: RankingContent): RankingCont
   const ranking = value as Partial<RankingContent>;
   return {
     title: typeof ranking.title === "string" ? ranking.title : fallback.title,
+    backgroundTheme: rankingBackgroundThemeValues.includes(
+      ranking.backgroundTheme as RankingBackgroundTheme,
+    )
+      ? (ranking.backgroundTheme as RankingBackgroundTheme)
+      : fallback.backgroundTheme,
     entries: Array.isArray(ranking.entries)
       ? ranking.entries
           .filter((entry) => entry && typeof entry === "object")
