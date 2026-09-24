@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    function hasValidSignageShape() {
+      return request.resource.data.keys().hasOnly([
+          'mode', 'ranking', 'notice', 'countdown', 'updatedAt'
+        ])
+        && request.resource.data.mode in ['ranking', 'notice', 'countdown']
+        && request.resource.data.ranking is map
+        && request.resource.data.ranking.keys().hasOnly(['title', 'entries'])
+        && request.resource.data.ranking.title is string
+        && request.resource.data.ranking.entries is list
+        && request.resource.data.ranking.entries.size() <= 10
+        && request.resource.data.notice is map
+        && request.resource.data.notice.keys().hasOnly(['title', 'message'])
+        && request.resource.data.notice.title is string
+        && request.resource.data.notice.message is string
+        && request.resource.data.countdown is map
+        && request.resource.data.countdown.keys().hasOnly(['title', 'targetDate', 'message'])
+        && request.resource.data.countdown.title is string
+        && request.resource.data.countdown.targetDate is string
+        && request.resource.data.countdown.message is string
+        && request.resource.data.updatedAt is timestamp;
+    }
+
+    match /signage/current {
+      allow read: if true;
+      allow create, update: if isAdmin() && hasValidSignageShape();
+      allow delete: if false;
+    }
+
+    match /admins/{uid} {
+      allow read, write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
