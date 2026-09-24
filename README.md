@@ -9,6 +9,7 @@
 - `/admin`：校舎スタッフ向け管理画面
 - `/display`：iPad横向き・常時表示向けサイネージ画面
 - 3つの表示モード：ランキング、重要なお知らせ、カウントダウン
+- 通常表示で複数のランキングスライドを10秒ごとに自動切替
 - Firestore `onSnapshot` によるリアルタイム切替
 - Firebase Authentication（メールアドレス＋パスワード）
 - Firestore Security Rules による書き込み制限
@@ -47,6 +48,7 @@ toshin-ipad-signage/
 │  │  │  └─ auth-gate.tsx         管理者ログイン
 │  │  └─ display/
 │  │     ├─ ranking-display.tsx   ランキング表示（後から差し替え可能）
+│  │     ├─ ranking-slideshow.tsx 10秒間隔のランキング自動切替
 │  │     ├─ notice-display.tsx    タイトル・本文のお知らせ表示
 │  │     ├─ countdown-display.tsx 残り日数の自動計算表示
 │  │     ├─ signage-canvas.tsx    modeに応じた表示切替
@@ -77,6 +79,20 @@ signage/current
       { id: "rank-1", name: "山田さん", score: 1800 }
     ]
   },
+  rankingSlides: [
+    {
+      title: "今週のランキング",
+      entries: [
+        { id: "rank-1", name: "山田さん", score: 1800 }
+      ]
+    },
+    {
+      title: "高速マスターランキング",
+      entries: [
+        { id: "slide-2-rank-1", name: "鈴木さん", score: 950 }
+      ]
+    }
+  ],
   notice: {
     title: "重要なお知らせ",
     message: "..."
@@ -89,6 +105,8 @@ signage/current
   updatedAt: Timestamp
 }
 ```
+
+`rankingSlides` は最大10枚です。`/display` は上から順に10秒ずつ表示します。既存データとの互換性のため `ranking` には第1スライドも保存します。古いデータに `rankingSlides` がない場合は、既存の `ranking` を自動的に第1スライドとして扱います。
 
 管理者判定用ドキュメント：
 
@@ -139,11 +157,13 @@ npm run dev
 確認手順：
 
 1. `/display` がランキング表示であることを確認
-2. `/admin` で重要なお知らせを入力
-3. 「重要なお知らせを今すぐ表示」を押す
-4. `/display` が再読み込みなしで切り替わることを確認
-5. 「通常表示（ランキング）に戻す」を押す
-6. `/display` がランキングへ戻ることを確認
+2. `/admin` でランキングスライドを2枚以上登録して保存
+3. `/display` が約10秒ごとに自動で切り替わることを確認
+4. `/admin` で重要なお知らせを入力
+5. 「重要なお知らせを今すぐ表示」を押す
+6. `/display` が再読み込みなしで切り替わることを確認
+7. 「通常表示（ランキング）に戻す」を押す
+8. `/display` がランキングの自動切替へ戻ることを確認
 
 デモモードはUI確認専用です。本番Vercelでは絶対に有効にしないでください。
 
@@ -317,7 +337,6 @@ npm run start   # 本番ビルドをローカル起動
 - 掲載開始・終了日時
 - 30分後にランキングへ自動復帰
 - 複数のお知らせ
-- 複数スライドの自動切替
 - ランキング自動更新
 - 時間帯による表示変更
 - 複数iPadの個別制御

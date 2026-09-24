@@ -11,7 +11,9 @@ const CACHE_KEY = "toshin-signage:last-state";
 const DEMO_CHANNEL = "toshin-signage:updates";
 
 export type ConnectionState = "loading" | "live" | "cached" | "error";
-type StatePatch = Partial<Pick<SignageState, "mode" | "ranking" | "notice" | "countdown">>;
+type StatePatch = Partial<
+  Pick<SignageState, "mode" | "ranking" | "rankingSlides" | "notice" | "countdown">
+>;
 
 function readCachedState(): SignageState | null {
   if (typeof window === "undefined") return null;

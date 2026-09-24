@@ -7,16 +7,61 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
 
+    function isValidRankingEntry(entry) {
+      return entry is map
+        && entry.keys().hasOnly(['id', 'name', 'score'])
+        && entry.id is string
+        && entry.name is string
+        && entry.score is number
+        && entry.score >= 0;
+    }
+
+    function hasValidRankingEntries(entries) {
+      return entries is list
+        && entries.size() >= 1
+        && entries.size() <= 10
+        && isValidRankingEntry(entries[0])
+        && (entries.size() < 2 || isValidRankingEntry(entries[1]))
+        && (entries.size() < 3 || isValidRankingEntry(entries[2]))
+        && (entries.size() < 4 || isValidRankingEntry(entries[3]))
+        && (entries.size() < 5 || isValidRankingEntry(entries[4]))
+        && (entries.size() < 6 || isValidRankingEntry(entries[5]))
+        && (entries.size() < 7 || isValidRankingEntry(entries[6]))
+        && (entries.size() < 8 || isValidRankingEntry(entries[7]))
+        && (entries.size() < 9 || isValidRankingEntry(entries[8]))
+        && (entries.size() < 10 || isValidRankingEntry(entries[9]));
+    }
+
+    function isValidRanking(ranking) {
+      return ranking is map
+        && ranking.keys().hasOnly(['title', 'entries'])
+        && ranking.title is string
+        && hasValidRankingEntries(ranking.entries);
+    }
+
+    function hasValidRankingSlides(slides) {
+      return slides is list
+        && slides.size() >= 1
+        && slides.size() <= 10
+        && isValidRanking(slides[0])
+        && (slides.size() < 2 || isValidRanking(slides[1]))
+        && (slides.size() < 3 || isValidRanking(slides[2]))
+        && (slides.size() < 4 || isValidRanking(slides[3]))
+        && (slides.size() < 5 || isValidRanking(slides[4]))
+        && (slides.size() < 6 || isValidRanking(slides[5]))
+        && (slides.size() < 7 || isValidRanking(slides[6]))
+        && (slides.size() < 8 || isValidRanking(slides[7]))
+        && (slides.size() < 9 || isValidRanking(slides[8]))
+        && (slides.size() < 10 || isValidRanking(slides[9]));
+    }
+
     function hasValidSignageShape() {
       return request.resource.data.keys().hasOnly([
-          'mode', 'ranking', 'notice', 'countdown', 'updatedAt'
+          'mode', 'ranking', 'rankingSlides', 'notice', 'countdown', 'updatedAt'
         ])
         && request.resource.data.mode in ['ranking', 'notice', 'countdown']
-        && request.resource.data.ranking is map
-        && request.resource.data.ranking.keys().hasOnly(['title', 'entries'])
-        && request.resource.data.ranking.title is string
-        && request.resource.data.ranking.entries is list
-        && request.resource.data.ranking.entries.size() <= 10
+        && isValidRanking(request.resource.data.ranking)
+        && hasValidRankingSlides(request.resource.data.rankingSlides)
         && request.resource.data.notice is map
         && request.resource.data.notice.keys().hasOnly(['title', 'message'])
         && request.resource.data.notice.title is string

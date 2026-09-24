@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { SignageCanvas } from "@/components/display/signage-canvas";
 import { useSignage } from "@/hooks/use-signage";
 import { updateSignage } from "@/lib/signage-store";
@@ -14,26 +14,84 @@ const modeLabels: Record<SignageMode, string> = {
 type Feedback = { kind: "success" | "error"; message: string } | null;
 
 export function AdminDashboard() {
-  const { signage, connection, connectionMessage } = useSignage();
-  const [ranking, setRanking] = useState<RankingContent>(signage.ranking);
+  const signageData = useSignage();
+
+  if (signageData.connection === "loading") {
+    return (
+      <main className="grid min-h-dvh place-items-center bg-slate-100 px-5 text-center text-lg font-black text-slate-700">
+        管理画面を読み込み中…
+      </main>
+    );
+  }
+
+  return <AdminDashboardContent {...signageData} />;
+}
+
+function AdminDashboardContent({
+  signage,
+  connection,
+  connectionMessage,
+}: ReturnType<typeof useSignage>) {
+  const [rankingSlides, setRankingSlides] = useState<RankingContent[]>(signage.rankingSlides);
   const [notice, setNotice] = useState<NoticeContent>(signage.notice);
   const [countdown, setCountdown] = useState<CountdownContent>(signage.countdown);
-  const [hasHydratedForms, setHasHydratedForms] = useState(false);
   const [feedback, setFeedback] = useState<Feedback>(null);
   const [busyAction, setBusyAction] = useState("");
 
-  useEffect(() => {
-    if (hasHydratedForms || connection === "loading") return;
-    setRanking(signage.ranking);
-    setNotice(signage.notice);
-    setCountdown(signage.countdown);
-    setHasHydratedForms(true);
-  }, [connection, hasHydratedForms, signage]);
-
   const previewState = useMemo(
-    () => ({ ...signage, ranking, notice, countdown }),
-    [signage, ranking, notice, countdown],
+    () => ({
+      ...signage,
+      ranking: rankingSlides[0] ?? signage.ranking,
+      rankingSlides,
+      notice,
+      countdown,
+    }),
+    [signage, rankingSlides, notice, countdown],
   );
+
+  const rankingPatch = {
+    ranking: rankingSlides[0] ?? signage.ranking,
+    rankingSlides,
+  };
+
+  function updateRankingSlide(index: number, update: (slide: RankingContent) => RankingContent) {
+    setRankingSlides((slides) =>
+      slides.map((slide, slideIndex) => (slideIndex === index ? update(slide) : slide)),
+    );
+  }
+
+  function addRankingSlide() {
+    setRankingSlides((slides) => {
+      if (slides.length >= 10) return slides;
+      const slideNumber = slides.length + 1;
+      const uniqueId = Date.now();
+      return [
+        ...slides,
+        {
+          title: `ランキング ${slideNumber}`,
+          entries: [1, 2, 3].map((rank) => ({
+            id: `slide-${uniqueId}-rank-${rank}`,
+            name: "",
+            score: 0,
+          })),
+        },
+      ];
+    });
+  }
+
+  function removeRankingSlide(index: number) {
+    setRankingSlides((slides) => slides.filter((_, slideIndex) => slideIndex !== index));
+  }
+
+  function moveRankingSlide(index: number, direction: -1 | 1) {
+    setRankingSlides((slides) => {
+      const destination = index + direction;
+      if (destination < 0 || destination >= slides.length) return slides;
+      const next = [...slides];
+      [next[index], next[destination]] = [next[destination], next[index]];
+      return next;
+    });
+  }
 
   async function runAction(label: string, action: () => Promise<void>) {
     setBusyAction(label);
@@ -62,7 +120,7 @@ export function AdminDashboard() {
           <button
             className="return-button"
             disabled={Boolean(busyAction)}
-            onClick={() => runAction("通常表示に変更", () => updateSignage({ mode: "ranking", ranking }))}
+            onClick={() => runAction("通常表示に変更", () => updateSignage({ mode: "ranking", ...rankingPatch }))}
           >
             通常表示（ランキング）に戻す
           </button>
@@ -94,35 +152,75 @@ export function AdminDashboard() {
           )}
 
           <section className="admin-card">
-            <SectionHeading number="01" title="ランキング" description="通常時に表示する内容" />
-            <label className="form-label mt-6">
-              見出し
-              <input className="form-input" value={ranking.title} onChange={(event) => setRanking((current) => ({ ...current, title: event.target.value }))} />
-            </label>
-            <div className="mt-5 space-y-3">
-              {ranking.entries.map((entry, index) => (
-                <div key={entry.id} className="grid grid-cols-[3rem_minmax(0,1fr)_9rem] items-center gap-3">
-                  <span className="text-center text-lg font-black text-blue-700">{index + 1}位</span>
-                  <input
-                    aria-label={`${index + 1}位の名前`}
-                    className="form-input mt-0"
-                    value={entry.name}
-                    onChange={(event) => setRanking((current) => ({ ...current, entries: current.entries.map((item, itemIndex) => itemIndex === index ? { ...item, name: event.target.value } : item) }))}
-                  />
-                  <input
-                    aria-label={`${index + 1}位の点数`}
-                    className="form-input mt-0"
-                    type="number"
-                    min="0"
-                    value={entry.score}
-                    onChange={(event) => setRanking((current) => ({ ...current, entries: current.entries.map((item, itemIndex) => itemIndex === index ? { ...item, score: Number(event.target.value) } : item) }))}
-                  />
+            <SectionHeading number="01" title="ランキングスライド" description="通常表示では10秒ごとに自動切替" />
+            <div className="mt-6 space-y-5">
+              {rankingSlides.map((ranking, slideIndex) => (
+                <div key={slideIndex} className="rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="text-lg font-black text-slate-900">スライド {slideIndex + 1}</h3>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        className="secondary-button min-h-0 px-3 py-2 text-sm"
+                        disabled={slideIndex === 0 || Boolean(busyAction)}
+                        onClick={() => moveRankingSlide(slideIndex, -1)}
+                      >
+                        上へ
+                      </button>
+                      <button
+                        className="secondary-button min-h-0 px-3 py-2 text-sm"
+                        disabled={slideIndex === rankingSlides.length - 1 || Boolean(busyAction)}
+                        onClick={() => moveRankingSlide(slideIndex, 1)}
+                      >
+                        下へ
+                      </button>
+                      <button
+                        className="danger-button"
+                        disabled={rankingSlides.length === 1 || Boolean(busyAction)}
+                        onClick={() => removeRankingSlide(slideIndex)}
+                      >
+                        削除
+                      </button>
+                    </div>
+                  </div>
+                  <label className="form-label mt-4">
+                    見出し
+                    <input
+                      className="form-input"
+                      value={ranking.title}
+                      onChange={(event) => updateRankingSlide(slideIndex, (slide) => ({ ...slide, title: event.target.value }))}
+                    />
+                  </label>
+                  <div className="mt-5 space-y-3">
+                    {ranking.entries.map((entry, entryIndex) => (
+                      <div key={entry.id} className="grid grid-cols-[3rem_minmax(0,1fr)_7rem] items-center gap-3 sm:grid-cols-[3rem_minmax(0,1fr)_9rem]">
+                        <span className="text-center text-lg font-black text-blue-700">{entryIndex + 1}位</span>
+                        <input
+                          aria-label={`スライド${slideIndex + 1} ${entryIndex + 1}位の名前`}
+                          className="form-input mt-0"
+                          value={entry.name}
+                          onChange={(event) => updateRankingSlide(slideIndex, (slide) => ({ ...slide, entries: slide.entries.map((item, itemIndex) => itemIndex === entryIndex ? { ...item, name: event.target.value } : item) }))}
+                        />
+                        <input
+                          aria-label={`スライド${slideIndex + 1} ${entryIndex + 1}位の点数`}
+                          className="form-input mt-0"
+                          type="number"
+                          min="0"
+                          value={entry.score}
+                          onChange={(event) => updateRankingSlide(slideIndex, (slide) => ({ ...slide, entries: slide.entries.map((item, itemIndex) => itemIndex === entryIndex ? { ...item, score: Number(event.target.value) } : item) }))}
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
+            <button className="secondary-button mt-5" disabled={rankingSlides.length >= 10 || Boolean(busyAction)} onClick={addRankingSlide}>
+              ＋ ランキングスライドを追加
+            </button>
+            <p className="mt-2 text-sm font-semibold text-slate-500">最大10枚まで。上から順に10秒ずつ表示します。</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <button className="secondary-button" disabled={Boolean(busyAction)} onClick={() => runAction("ランキングを保存", () => updateSignage({ ranking }))}>ランキング内容を保存</button>
-              <button className="primary-button" disabled={Boolean(busyAction)} onClick={() => runAction("ランキングを表示", () => updateSignage({ mode: "ranking", ranking }))}>今すぐランキングを表示</button>
+              <button className="secondary-button" disabled={Boolean(busyAction)} onClick={() => runAction("ランキングを保存", () => updateSignage(rankingPatch))}>ランキングスライドを保存</button>
+              <button className="primary-button" disabled={Boolean(busyAction)} onClick={() => runAction("ランキングを表示", () => updateSignage({ mode: "ranking", ...rankingPatch }))}>今すぐランキングを表示</button>
             </div>
           </section>
 
