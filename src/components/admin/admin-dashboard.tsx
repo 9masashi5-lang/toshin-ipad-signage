@@ -79,7 +79,7 @@ function AdminDashboardContent({
           entries: [1, 2, 3].map((rank) => ({
             id: `slide-${uniqueId}-rank-${rank}`,
             name: "",
-            score: 0,
+            score: "",
           })),
         },
       ];
@@ -159,7 +159,7 @@ function AdminDashboardContent({
           )}
 
           <section className="admin-card">
-            <SectionHeading number="01" title="ランキングスライド" description="通常表示では10秒ごとに自動切替" />
+            <SectionHeading number="01" title="ランキングスライド" description="通常表示では5秒ごとに自動切替" />
             <div className="mt-6 space-y-5">
               {rankingSlides.map((ranking, slideIndex) => (
                 <div key={slideIndex} className="rounded-lg border border-slate-200 bg-slate-50 p-4 sm:p-5">
@@ -218,7 +218,7 @@ function AdminDashboardContent({
                   </label>
                   <div className="mt-5 space-y-3">
                     {ranking.entries.map((entry, entryIndex) => (
-                      <div key={entry.id} className="grid grid-cols-[3rem_minmax(0,1fr)_7rem] items-center gap-3 sm:grid-cols-[3rem_minmax(0,1fr)_9rem]">
+                      <div key={entry.id} className="grid grid-cols-[3rem_minmax(0,1fr)] items-center gap-3 sm:grid-cols-[3rem_minmax(0,1fr)_12rem]">
                         <span className="text-center text-lg font-black text-blue-700">{entryIndex + 1}位</span>
                         <input
                           aria-label={`スライド${slideIndex + 1} ${entryIndex + 1}位の名前`}
@@ -227,12 +227,12 @@ function AdminDashboardContent({
                           onChange={(event) => updateRankingSlide(slideIndex, (slide) => ({ ...slide, entries: slide.entries.map((item, itemIndex) => itemIndex === entryIndex ? { ...item, name: event.target.value } : item) }))}
                         />
                         <input
-                          aria-label={`スライド${slideIndex + 1} ${entryIndex + 1}位の点数`}
-                          className="form-input mt-0"
-                          type="number"
-                          min="0"
+                          aria-label={`スライド${slideIndex + 1} ${entryIndex + 1}位の表示値`}
+                          className="form-input col-start-2 mt-0 sm:col-start-auto"
+                          maxLength={40}
+                          placeholder="例：1800点 / 全国1位"
                           value={entry.score}
-                          onChange={(event) => updateRankingSlide(slideIndex, (slide) => ({ ...slide, entries: slide.entries.map((item, itemIndex) => itemIndex === entryIndex ? { ...item, score: Number(event.target.value) } : item) }))}
+                          onChange={(event) => updateRankingSlide(slideIndex, (slide) => ({ ...slide, entries: slide.entries.map((item, itemIndex) => itemIndex === entryIndex ? { ...item, score: event.target.value } : item) }))}
                         />
                       </div>
                     ))}
@@ -243,7 +243,7 @@ function AdminDashboardContent({
             <button className="secondary-button mt-5" disabled={rankingSlides.length >= 10 || Boolean(busyAction)} onClick={addRankingSlide}>
               ＋ ランキングスライドを追加
             </button>
-            <p className="mt-2 text-sm font-semibold text-slate-500">最大10枚まで。上から順に10秒ずつ表示します。</p>
+            <p className="mt-2 text-sm font-semibold text-slate-500">最大10枚まで。上から順に5秒ずつ表示します。</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <button className="secondary-button" disabled={Boolean(busyAction)} onClick={() => runAction("ランキングを保存", () => updateSignage(rankingPatch))}>ランキングスライドを保存</button>
               <button className="primary-button" disabled={Boolean(busyAction)} onClick={() => runAction("ランキングを表示", () => updateSignage({ mode: "ranking", ...rankingPatch }))}>今すぐランキングを表示</button>

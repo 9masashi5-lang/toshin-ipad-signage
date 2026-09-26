@@ -1,5 +1,13 @@
 import type { RankingContent } from "@/types/signage";
 
+function formatRankingScore(score: string) {
+  const trimmedScore = score.trim();
+  if (!trimmedScore) return "—";
+  return /^\d+$/.test(trimmedScore)
+    ? trimmedScore.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+    : trimmedScore;
+}
+
 export function RankingDisplay({ ranking }: { ranking: RankingContent }) {
   return (
     <section
@@ -26,7 +34,7 @@ export function RankingDisplay({ ranking }: { ranking: RankingContent }) {
                 {entry.name || "—"}
               </span>
               <span className="ranking-score text-[clamp(1.35rem,3.2vw,3rem)] font-black tabular-nums">
-                {entry.score.toLocaleString("ja-JP")}
+                {formatRankingScore(entry.score)}
               </span>
             </li>
           ))}

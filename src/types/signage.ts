@@ -1,7 +1,7 @@
 export type SignageMode = "ranking" | "notice" | "countdown";
 export type RankingBackgroundTheme = "navy" | "blue" | "green" | "red" | "gold" | "light";
 
-export type RankingEntry = { id: string; name: string; score: number };
+export type RankingEntry = { id: string; name: string; score: string };
 export type RankingContent = {
   title: string;
   backgroundTheme: RankingBackgroundTheme;
@@ -30,9 +30,9 @@ const defaultRanking: RankingContent = {
   title: "今週のランキング",
   backgroundTheme: "navy",
   entries: [
-    { id: "rank-1", name: "山田さん", score: 1800 },
-    { id: "rank-2", name: "田中さん", score: 1600 },
-    { id: "rank-3", name: "佐藤さん", score: 1540 },
+    { id: "rank-1", name: "山田さん", score: "1800" },
+    { id: "rank-2", name: "田中さん", score: "1600" },
+    { id: "rank-3", name: "佐藤さん", score: "1540" },
   ],
 };
 
@@ -123,9 +123,11 @@ function normalizeRanking(value: unknown, fallback: RankingContent): RankingCont
               id: typeof item.id === "string" ? item.id : `rank-${index + 1}`,
               name: typeof item.name === "string" ? item.name : "",
               score:
-                typeof item.score === "number" && Number.isFinite(item.score)
+                typeof item.score === "string"
                   ? item.score
-                  : 0,
+                  : typeof item.score === "number" && Number.isFinite(item.score)
+                    ? String(item.score)
+                    : "",
             };
           })
       : fallback.entries,

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { RankingDisplay } from "@/components/display/ranking-display";
 import type { RankingContent } from "@/types/signage";
 
-export const RANKING_SLIDE_INTERVAL_MS = 10_000;
+export const RANKING_SLIDE_INTERVAL_MS = 5_000;
 
 export function RankingSlideshow({ slides }: { slides: RankingContent[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);

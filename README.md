@@ -9,7 +9,8 @@
 - `/admin`：校舎スタッフ向け管理画面
 - `/display`：iPad横向き・常時表示向けサイネージ画面
 - 3つの表示モード：ランキング、重要なお知らせ、カウントダウン
-- 通常表示で複数のランキングスライドを10秒ごとに自動切替
+- 通常表示で複数のランキングスライドを5秒ごとに自動切替
+- ランキングの表示値は数字だけでなく「1800点」「全国1位」などの文字にも対応
 - ランキングスライドごとに6種類の背景デザインを選択
 - Firestore `onSnapshot` によるリアルタイム切替
 - Firebase Authentication（メールアドレス＋パスワード）
@@ -49,7 +50,7 @@ toshin-ipad-signage/
 │  │  │  └─ auth-gate.tsx         管理者ログイン
 │  │  └─ display/
 │  │     ├─ ranking-display.tsx   ランキング表示（後から差し替え可能）
-│  │     ├─ ranking-slideshow.tsx 10秒間隔のランキング自動切替
+│  │     ├─ ranking-slideshow.tsx 5秒間隔のランキング自動切替
 │  │     ├─ notice-display.tsx    タイトル・本文のお知らせ表示
 │  │     ├─ countdown-display.tsx 残り日数の自動計算表示
 │  │     ├─ signage-canvas.tsx    modeに応じた表示切替
@@ -77,7 +78,7 @@ signage/current
   ranking: {
     title: "今週のランキング",
     entries: [
-      { id: "rank-1", name: "山田さん", score: 1800 }
+      { id: "rank-1", name: "山田さん", score: "1800点" }
     ]
   },
   rankingSlides: [
@@ -85,14 +86,14 @@ signage/current
       title: "今週のランキング",
       backgroundTheme: "navy",
       entries: [
-        { id: "rank-1", name: "山田さん", score: 1800 }
+        { id: "rank-1", name: "山田さん", score: "1800点" }
       ]
     },
     {
       title: "高速マスターランキング",
       backgroundTheme: "green",
       entries: [
-        { id: "slide-2-rank-1", name: "鈴木さん", score: 950 }
+        { id: "slide-2-rank-1", name: "鈴木さん", score: "全国1位" }
       ]
     }
   ],
@@ -109,7 +110,7 @@ signage/current
 }
 ```
 
-`rankingSlides` は最大10枚です。`/display` は上から順に10秒ずつ表示します。各スライドの `backgroundTheme` には `navy`、`blue`、`green`、`red`、`gold`、`light` のいずれかを保存します。既存データとの互換性のため `ranking` には第1スライドも保存し、古いデータに `rankingSlides` や `backgroundTheme` がない場合は既存ランキングとネイビー背景を使用します。重要なお知らせとカウントダウンの操作は必要なフィールドだけを更新するため、一度表示すると「通常表示（ランキング）に戻す」を押すまで固定表示されます。
+`rankingSlides` は最大10枚です。`/display` は上から順に5秒ずつ表示します。`score` は最大40文字の文字列で、「1800」「1800点」「全国1位」などを入力できます。数字だけの場合は表示時に3桁区切りになります。既存の数値データも自動的に文字列へ変換して表示します。各スライドの `backgroundTheme` には `navy`、`blue`、`green`、`red`、`gold`、`light` のいずれかを保存します。既存データとの互換性のため `ranking` には第1スライドも保存し、古いデータに `rankingSlides` や `backgroundTheme` がない場合は既存ランキングとネイビー背景を使用します。重要なお知らせとカウントダウンの操作は必要なフィールドだけを更新するため、一度表示すると「通常表示（ランキング）に戻す」を押すまで固定表示されます。
 
 管理者判定用ドキュメント：
 
@@ -161,7 +162,7 @@ npm run dev
 
 1. `/display` がランキング表示であることを確認
 2. `/admin` でランキングスライドを2枚以上登録して保存
-3. `/display` が約10秒ごとに自動で切り替わることを確認
+3. `/display` が約5秒ごとに自動で切り替わることを確認
 4. `/admin` で重要なお知らせを入力
 5. 「重要なお知らせを今すぐ表示」を押す
 6. `/display` が再読み込みなしで切り替わることを確認
