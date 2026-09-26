@@ -12,10 +12,7 @@ service cloud.firestore {
         && entry.keys().hasOnly(['id', 'name', 'score'])
         && entry.id is string
         && entry.name is string
-        && (
-          (entry.score is string && entry.score.size() <= 40)
-          || (entry.score is number && entry.score >= 0)
-        );
+        && (entry.score is string || entry.score is number);
     }
 
     function hasValidRankingEntries(entries) {
