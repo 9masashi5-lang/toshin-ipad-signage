@@ -1,5 +1,6 @@
 export type SignageMode = "ranking" | "notice" | "countdown";
 export type RankingBackgroundTheme = "navy" | "blue" | "green" | "red" | "gold" | "light";
+export type NoticeMessageSize = "small" | "medium" | "large" | "xlarge";
 
 export type RankingEntry = { id: string; name: string; score: string };
 export type RankingContent = {
@@ -10,6 +11,7 @@ export type RankingContent = {
 export type NoticeContent = {
   title: string;
   message: string;
+  messageSize: NoticeMessageSize;
 };
 export type CountdownContent = {
   title: string;
@@ -43,6 +45,7 @@ export const defaultSignageState: SignageState = {
   notice: {
     title: "重要なお知らせ",
     message: "本日の予定を確認してください。",
+    messageSize: "medium",
   },
   countdown: {
     title: "共通テストまで",
@@ -52,6 +55,16 @@ export const defaultSignageState: SignageState = {
 };
 
 const modes: SignageMode[] = ["ranking", "notice", "countdown"];
+export const noticeMessageSizes: Array<{
+  value: NoticeMessageSize;
+  label: string;
+}> = [
+  { value: "small", label: "小（文章が長いとき）" },
+  { value: "medium", label: "標準" },
+  { value: "large", label: "大" },
+  { value: "xlarge", label: "特大（短い文章向け）" },
+];
+const noticeMessageSizeValues = noticeMessageSizes.map(({ value }) => value);
 export const rankingBackgroundThemes: Array<{
   value: RankingBackgroundTheme;
   label: string;
@@ -87,6 +100,9 @@ export function normalizeSignageState(value: unknown): SignageState {
       title: typeof notice?.title === "string" ? notice.title : defaultSignageState.notice.title,
       message:
         typeof notice?.message === "string" ? notice.message : defaultSignageState.notice.message,
+      messageSize: noticeMessageSizeValues.includes(notice?.messageSize as NoticeMessageSize)
+        ? (notice?.messageSize as NoticeMessageSize)
+        : defaultSignageState.notice.messageSize,
     },
     countdown: {
       title:

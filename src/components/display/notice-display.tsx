@@ -1,5 +1,12 @@
 import type { NoticeContent } from "@/types/signage";
 
+const messageSizeClasses: Record<NoticeContent["messageSize"], string> = {
+  small: "text-[clamp(1.1rem,2.2vw,2rem)]",
+  medium: "text-[clamp(1.3rem,3vw,2.7rem)]",
+  large: "text-[clamp(1.7rem,4vw,3.6rem)]",
+  xlarge: "text-[clamp(2.1rem,5vw,4.5rem)]",
+};
+
 export function NoticeDisplay({ notice }: { notice: NoticeContent }) {
   return (
     <section className="signage-stage notice-stage" aria-label="重要なお知らせ">
@@ -13,7 +20,7 @@ export function NoticeDisplay({ notice }: { notice: NoticeContent }) {
             {notice.title || "重要なお知らせ"}
           </h1>
           {notice.message && (
-            <p className="mt-[clamp(1.2rem,4vh,3rem)] whitespace-pre-wrap text-[clamp(1.3rem,3vw,2.7rem)] font-bold leading-[1.5] text-slate-700">
+            <p className={`mt-[clamp(1.2rem,4vh,3rem)] whitespace-pre-wrap font-bold leading-[1.5] text-slate-700 ${messageSizeClasses[notice.messageSize]}`}>
               {notice.message}
             </p>
           )}

@@ -65,9 +65,13 @@ service cloud.firestore {
           || hasValidRankingSlides(request.resource.data.rankingSlides)
         )
         && request.resource.data.notice is map
-        && request.resource.data.notice.keys().hasOnly(['title', 'message'])
+        && request.resource.data.notice.keys().hasOnly(['title', 'message', 'messageSize'])
         && request.resource.data.notice.title is string
         && request.resource.data.notice.message is string
+        && (
+          !request.resource.data.notice.keys().hasAny(['messageSize'])
+          || request.resource.data.notice.messageSize in ['small', 'medium', 'large', 'xlarge']
+        )
         && request.resource.data.countdown is map
         && request.resource.data.countdown.keys().hasOnly(['title', 'targetDate', 'message'])
         && request.resource.data.countdown.title is string

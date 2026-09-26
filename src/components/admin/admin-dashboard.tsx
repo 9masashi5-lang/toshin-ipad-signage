@@ -5,6 +5,7 @@ import { SignageCanvas } from "@/components/display/signage-canvas";
 import { useSignage } from "@/hooks/use-signage";
 import { updateSignage } from "@/lib/signage-store";
 import {
+  noticeMessageSizes,
   rankingBackgroundThemes,
   type CountdownContent,
   type NoticeContent,
@@ -260,6 +261,25 @@ function AdminDashboardContent({
               <label className="form-label">
                 本文
                 <textarea className="form-input min-h-32 resize-y" value={notice.message} onChange={(event) => setNotice((current) => ({ ...current, message: event.target.value }))} />
+              </label>
+              <label className="form-label">
+                本文の文字サイズ
+                <select
+                  className="form-input"
+                  value={notice.messageSize}
+                  onChange={(event) =>
+                    setNotice((current) => ({
+                      ...current,
+                      messageSize: event.target.value as NoticeContent["messageSize"],
+                    }))
+                  }
+                >
+                  {noticeMessageSizes.map((size) => (
+                    <option key={size.value} value={size.value}>
+                      {size.label}
+                    </option>
+                  ))}
+                </select>
               </label>
             </div>
             <button className="primary-button mt-6" disabled={Boolean(busyAction)} onClick={() => runAction("重要なお知らせを表示", () => updateSignage({ mode: "notice", notice }))}>
