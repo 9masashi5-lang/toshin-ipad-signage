@@ -43,19 +43,12 @@ service cloud.firestore {
     }
 
     function hasValidRankingSlides(slides) {
+      // 管理者だけが書き込める前提で、ここでは枚数だけを検証する。
+      // 全スライド・全項目を個別検証すると、枚数増加時に
+      // Firestore Security Rules の評価上限へ達して保存に失敗するため。
       return slides is list
         && slides.size() >= 1
-        && slides.size() <= 10
-        && isValidRanking(slides[0])
-        && (slides.size() < 2 || isValidRanking(slides[1]))
-        && (slides.size() < 3 || isValidRanking(slides[2]))
-        && (slides.size() < 4 || isValidRanking(slides[3]))
-        && (slides.size() < 5 || isValidRanking(slides[4]))
-        && (slides.size() < 6 || isValidRanking(slides[5]))
-        && (slides.size() < 7 || isValidRanking(slides[6]))
-        && (slides.size() < 8 || isValidRanking(slides[7]))
-        && (slides.size() < 9 || isValidRanking(slides[8]))
-        && (slides.size() < 10 || isValidRanking(slides[9]));
+        && slides.size() <= 10;
     }
 
     function hasValidSignageShape() {
