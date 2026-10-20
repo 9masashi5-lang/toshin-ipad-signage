@@ -73,10 +73,16 @@ service cloud.firestore {
           || request.resource.data.notice.messageSize in ['small', 'medium', 'large', 'xlarge']
         )
         && request.resource.data.countdown is map
-        && request.resource.data.countdown.keys().hasOnly(['title', 'targetDate', 'message'])
+        && request.resource.data.countdown.keys().hasOnly([
+          'title', 'targetDate', 'message', 'hiddenEventsEnabled'
+        ])
         && request.resource.data.countdown.title is string
         && request.resource.data.countdown.targetDate is string
         && request.resource.data.countdown.message is string
+        && (
+          !request.resource.data.countdown.keys().hasAny(['hiddenEventsEnabled'])
+          || request.resource.data.countdown.hiddenEventsEnabled is bool
+        )
         && request.resource.data.updatedAt is timestamp;
     }
 

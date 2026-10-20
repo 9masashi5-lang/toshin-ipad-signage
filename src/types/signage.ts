@@ -17,6 +17,7 @@ export type CountdownContent = {
   title: string;
   targetDate: string;
   message: string;
+  hiddenEventsEnabled: boolean;
 };
 
 export type SignageState = {
@@ -51,6 +52,7 @@ export const defaultSignageState: SignageState = {
     title: "共通テストまで",
     targetDate: "",
     message: "今日も一歩ずつ。",
+    hiddenEventsEnabled: true,
   },
 };
 
@@ -114,6 +116,10 @@ export function normalizeSignageState(value: unknown): SignageState {
         typeof countdown?.message === "string"
           ? countdown.message
           : defaultSignageState.countdown.message,
+      hiddenEventsEnabled:
+        typeof countdown?.hiddenEventsEnabled === "boolean"
+          ? countdown.hiddenEventsEnabled
+          : defaultSignageState.countdown.hiddenEventsEnabled,
     },
     updatedAt: data.updatedAt,
   };

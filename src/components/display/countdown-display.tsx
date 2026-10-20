@@ -11,8 +11,32 @@ const timePeriodSettings: Record<TokyoTimePeriod, { className: string; label: st
   night: { className: "countdown-theme-night", label: "NIGHT MISSION" },
 };
 
+type HiddenEvent = {
+  kind: "milestone" | "rare";
+  eyebrow: string;
+  title: string;
+  message: string;
+};
+
+const milestoneEvents: Partial<Record<number, Omit<HiddenEvent, "kind">>> = {
+  100: { eyebrow: "THE NEXT 100 DAYS", title: "あと100日", message: "ここから、すべてが伸びる。" },
+  50: { eyebrow: "HALFWAY BOOST", title: "あと50日", message: "本気が、結果に変わる時間。" },
+  30: { eyebrow: "LAST 30 DAYS", title: "あと30日", message: "一日ごとの積み重ねが、大きな差になる。" },
+  10: { eyebrow: "FINAL COUNTDOWN", title: "あと10日", message: "積み上げた力を、答案へ。" },
+  7: { eyebrow: "ONE WEEK TO GO", title: "あと1週間", message: "最後まで、伸び続ける。" },
+  1: { eyebrow: "TOMORROW", title: "いよいよ明日", message: "いつも通り、全力で。" },
+};
+
+const rareEvent: HiddenEvent = {
+  kind: "rare",
+  eyebrow: "ONE MINUTE, ONE FUTURE",
+  title: "その1分が、合否を変える",
+  message: "今できる一問に、集中しよう。",
+};
+
 export function CountdownDisplay({ countdown }: { countdown: CountdownContent }) {
   const [now, setNow] = useState(() => new Date());
+  const [hiddenEvent, setHiddenEvent] = useState<HiddenEvent | null>(null);
   useEffect(() => {
     const timer = window.setInterval(() => setNow(new Date()), 60_000);
     return () => window.clearInterval(timer);
@@ -22,6 +46,46 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
   const dayLabel = days === null ? "—" : Math.max(days, 0).toLocaleString("ja-JP");
   const timePeriod = getTokyoTimePeriod(now);
   const theme = timePeriodSettings[timePeriod];
+
+  useEffect(() => {
+    if (!countdown.hiddenEventsEnabled) return;
+
+    let milestoneTimer: number | undefined;
+    let rareTimer: number | undefined;
+    let hideTimer: number | undefined;
+
+    const showEvent = (event: HiddenEvent, duration: number) => {
+      window.clearTimeout(hideTimer);
+      setHiddenEvent(event);
+      hideTimer = window.setTimeout(() => setHiddenEvent(null), duration);
+    };
+
+    const milestone = days === null ? undefined : milestoneEvents[days];
+    if (milestone) {
+      milestoneTimer = window.setTimeout(
+        () => showEvent({ kind: "milestone", ...milestone }, 8_000),
+        1_800,
+      );
+    }
+
+    const scheduleRareEvent = (firstRun: boolean) => {
+      const minimumDelay = firstRun ? 120_000 : 240_000;
+      const randomWindow = firstRun ? 120_000 : 240_000;
+      rareTimer = window.setTimeout(() => {
+        showEvent(rareEvent, 6_500);
+        scheduleRareEvent(false);
+      }, minimumDelay + Math.random() * randomWindow);
+    };
+    scheduleRareEvent(true);
+
+    return () => {
+      window.clearTimeout(milestoneTimer);
+      window.clearTimeout(rareTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, [countdown.hiddenEventsEnabled, days]);
+
+  const visibleHiddenEvent = countdown.hiddenEventsEnabled ? hiddenEvent : null;
 
   return (
     <section className={`signage-stage countdown-stage ${theme.className}`} aria-label="カウントダウン">
@@ -54,6 +118,21 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
         <span aria-hidden="true" />
         {theme.label}
       </p>
+      {visibleHiddenEvent ? (
+        <div
+          className={`countdown-event-overlay countdown-event-${visibleHiddenEvent.kind}`}
+          role="status"
+          aria-live="polite"
+        >
+          <div className="countdown-event-rays" aria-hidden="true" />
+          <div className="countdown-event-scan" aria-hidden="true" />
+          <div className="countdown-event-content">
+            <p className="countdown-event-eyebrow">{visibleHiddenEvent.eyebrow}</p>
+            <p className="countdown-event-title">{visibleHiddenEvent.title}</p>
+            <p className="countdown-event-message">{visibleHiddenEvent.message}</p>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

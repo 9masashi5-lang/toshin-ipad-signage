@@ -107,13 +107,14 @@ signage/current
   countdown: {
     title: "共通テストまで",
     targetDate: "2027-01-16",
-    message: "今日も一歩ずつ。"
+    message: "今日も一歩ずつ。",
+    hiddenEventsEnabled: true
   },
   updatedAt: Timestamp
 }
 ```
 
-`rankingSlides` は最大10枚です。`/display` は上から順に5秒ずつ表示します。`score` は最大40文字の文字列で、「1800」「1800点」「全国1位」などを入力できます。数字だけの場合は表示時に3桁区切りになります。既存の数値データも自動的に文字列へ変換して表示します。各スライドの `backgroundTheme` には `navy`、`blue`、`green`、`red`、`gold`、`light` のいずれかを保存します。既存データとの互換性のため `ranking` には第1スライドも保存し、古いデータに `rankingSlides` や `backgroundTheme` がない場合は既存ランキングとネイビー背景を使用します。重要なお知らせの `messageSize` は `small`、`medium`、`large`、`xlarge` の4段階です。古いデータにこの項目がない場合は `medium` を使用します。重要なお知らせとカウントダウンの操作は必要なフィールドだけを更新するため、一度表示すると「通常表示（ランキング）に戻す」を押すまで固定表示されます。
+`rankingSlides` は最大10枚です。`/display` は上から順に5秒ずつ表示します。`score` は最大40文字の文字列で、「1800」「1800点」「全国1位」などを入力できます。数字だけの場合は表示時に3桁区切りになります。既存の数値データも自動的に文字列へ変換して表示します。各スライドの `backgroundTheme` には `navy`、`blue`、`green`、`red`、`gold`、`light` のいずれかを保存します。既存データとの互換性のため `ranking` には第1スライドも保存し、古いデータに `rankingSlides` や `backgroundTheme` がない場合は既存ランキングとネイビー背景を使用します。重要なお知らせの `messageSize` は `small`、`medium`、`large`、`xlarge` の4段階です。古いデータにこの項目がない場合は `medium` を使用します。`hiddenEventsEnabled` はカウントダウンの隠しイベントのON・OFFです。ONの場合、残り100日・50日・30日・10日・7日・1日に特別演出を表示し、通常時も数分に一度だけ短い応援メッセージを表示します。重要なお知らせとカウントダウンの操作は必要なフィールドだけを更新するため、一度表示すると「通常表示（ランキング）に戻す」を押すまで固定表示されます。
 
 管理者判定用ドキュメント：
 

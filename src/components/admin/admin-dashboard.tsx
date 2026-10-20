@@ -302,10 +302,34 @@ function AdminDashboardContent({
                 補足メッセージ
                 <input className="form-input" value={countdown.message} onChange={(event) => setCountdown((current) => ({ ...current, message: event.target.value }))} />
               </label>
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-violet-200 bg-violet-50 p-4 sm:col-span-2">
+                <input
+                  className="mt-1 h-5 w-5 accent-violet-600"
+                  type="checkbox"
+                  checked={countdown.hiddenEventsEnabled}
+                  onChange={(event) =>
+                    setCountdown((current) => ({
+                      ...current,
+                      hiddenEventsEnabled: event.target.checked,
+                    }))
+                  }
+                />
+                <span>
+                  <span className="block font-black text-violet-950">隠しイベントをONにする</span>
+                  <span className="mt-1 block text-sm font-semibold leading-relaxed text-violet-800">
+                    節目の日の特別演出と、まれに表示される応援メッセージを有効にします。
+                  </span>
+                </span>
+              </label>
             </div>
-            <button className="primary-button mt-6" disabled={Boolean(busyAction) || !countdown.targetDate} onClick={() => runAction("カウントダウンを表示", () => updateSignage({ mode: "countdown", countdown }))}>
-              カウントダウンを今すぐ表示
-            </button>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <button className="secondary-button" disabled={Boolean(busyAction)} onClick={() => runAction("カウントダウン設定を保存", () => updateSignage({ countdown }))}>
+                カウントダウン設定を保存
+              </button>
+              <button className="primary-button" disabled={Boolean(busyAction) || !countdown.targetDate} onClick={() => runAction("カウントダウンを表示", () => updateSignage({ mode: "countdown", countdown }))}>
+                カウントダウンを今すぐ表示
+              </button>
+            </div>
           </section>
         </div>
 
