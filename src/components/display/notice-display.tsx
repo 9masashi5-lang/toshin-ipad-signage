@@ -10,7 +10,7 @@ const messageSizeClasses: Record<NoticeContent["messageSize"], string> = {
 export function NoticeDisplay({ notice }: { notice: NoticeContent }) {
   return (
     <section className="signage-stage notice-stage" aria-label="重要なお知らせ">
-      <div className="notice-accent" />
+      <div className="notice-accent" aria-hidden="true" />
       <div className="notice-layout">
         <div className="min-w-0">
           <div className="mb-6 inline-flex items-center gap-3 rounded-full bg-red-600 px-5 py-2 text-[clamp(0.9rem,1.7vw,1.3rem)] font-black tracking-[0.16em] text-white">

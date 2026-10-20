@@ -14,8 +14,8 @@ export function RankingDisplay({ ranking }: { ranking: RankingContent }) {
       className={`signage-stage ranking-stage ranking-theme-${ranking.backgroundTheme}`}
       aria-label="ランキング"
     >
-      <div className="ranking-orb ranking-orb-one" />
-      <div className="ranking-orb ranking-orb-two" />
+      <div className="ranking-orb ranking-orb-one" aria-hidden="true" />
+      <div className="ranking-orb ranking-orb-two" aria-hidden="true" />
       <div className="relative z-10 flex h-full w-full flex-col justify-center px-[clamp(2rem,6vw,6rem)] py-[clamp(1.5rem,5vh,4rem)]">
         <p className="ranking-kicker mb-3 text-[clamp(1rem,2vw,1.5rem)] font-bold tracking-[0.24em]">
           WEEKLY ACHIEVEMENT
@@ -28,6 +28,7 @@ export function RankingDisplay({ ranking }: { ranking: RankingContent }) {
             <li
               key={entry.id}
               className={`ranking-row ${index === 0 ? "ranking-row-first" : ""}`}
+              style={{ animationDelay: `${180 + index * 140}ms` }}
             >
               <span className="rank-number">{index + 1}</span>
               <span className="ranking-name min-w-0 flex-1 truncate text-[clamp(1.35rem,3.2vw,3rem)] font-extrabold">

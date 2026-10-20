@@ -16,14 +16,16 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
 
   return (
     <section className="signage-stage countdown-stage" aria-label="カウントダウン">
-      <div className="countdown-grid" />
+      <div className="countdown-grid" aria-hidden="true" />
+      <div className="countdown-ring countdown-ring-one" aria-hidden="true" />
+      <div className="countdown-ring countdown-ring-two" aria-hidden="true" />
       <div className="relative z-10 flex h-full w-full flex-col items-center justify-center px-8 py-10 text-center">
         <p className="text-[clamp(1.8rem,4vw,4rem)] font-black tracking-wide text-blue-100">
           {countdown.title || "目標日まで"}
         </p>
         <p className="mt-[clamp(1rem,3vh,2rem)] text-[clamp(1.3rem,2.5vw,2.2rem)] font-bold text-cyan-200">あと</p>
         <div className="my-[clamp(0.5rem,2vh,1.5rem)] flex items-end justify-center gap-[clamp(0.75rem,2vw,1.5rem)]">
-          <span className="text-[clamp(7rem,24vw,20rem)] font-black leading-[0.82] tracking-[-0.08em] text-white tabular-nums drop-shadow-2xl">
+          <span className="countdown-number text-[clamp(7rem,24vw,20rem)] font-black leading-[0.82] tracking-[-0.08em] text-white tabular-nums drop-shadow-2xl">
             {dayLabel}
           </span>
           <span className="pb-[clamp(0.8rem,3vw,2.5rem)] text-[clamp(2.5rem,6vw,5rem)] font-black text-cyan-200">日</span>
