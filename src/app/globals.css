@@ -126,7 +126,26 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 }
 .notice-layout > div { animation: notice-content-arrive 750ms cubic-bezier(0.22, 1, 0.36, 1) 100ms both; }
 
-.countdown-stage { background: radial-gradient(circle at 50% 15%, rgb(56 215 232 / 28%), transparent 35%), linear-gradient(145deg, #05132d, #0b4ca8 62%, #086788); }
+.countdown-stage {
+  --countdown-accent: #67e8f9;
+  --countdown-soft: #cffafe;
+  --countdown-ring: rgb(103 232 249 / 18%);
+  --countdown-glow: rgb(34 211 238 / 38%);
+  color: white;
+  background: linear-gradient(145deg, #05132d, #0b4ca8 62%, #086788);
+  transition: background 1.4s ease;
+}
+.countdown-theme-morning { --countdown-accent: #fff2b2; --countdown-soft: #fff7d6; --countdown-ring: rgb(255 244 190 / 24%); --countdown-glow: rgb(255 205 105 / 42%); background: linear-gradient(145deg, #163d73 0%, #dd7c69 55%, #f7b267 100%); }
+.countdown-theme-day { --countdown-accent: #cffafe; --countdown-soft: #e0f2fe; --countdown-ring: rgb(207 250 254 / 23%); --countdown-glow: rgb(34 211 238 / 38%); background: linear-gradient(145deg, #063d78 0%, #0b78c8 55%, #20b8c8 100%); }
+.countdown-theme-evening { --countdown-accent: #fed7aa; --countdown-soft: #ffedd5; --countdown-ring: rgb(253 186 116 / 24%); --countdown-glow: rgb(251 146 60 / 42%); background: linear-gradient(145deg, #301b5c 0%, #8b3f73 48%, #e76f51 100%); }
+.countdown-theme-night { --countdown-accent: #a5f3fc; --countdown-soft: #dbeafe; --countdown-ring: rgb(103 232 249 / 18%); --countdown-glow: rgb(103 232 249 / 38%); background: linear-gradient(145deg, #020617 0%, #172554 52%, #164e63 100%); }
+.countdown-atmosphere { position: absolute; inset: 0; background: radial-gradient(circle at 50% 12%, var(--countdown-glow), transparent 38%); transition: background 1.4s ease; }
+.countdown-stars { position: absolute; inset: 0; opacity: 0; background-image: radial-gradient(circle, rgb(255 255 255 / 90%) 1px, transparent 1.5px), radial-gradient(circle, rgb(165 243 252 / 75%) 1px, transparent 1.5px); background-position: 0 0, 37px 49px; background-size: 83px 83px, 127px 127px; transition: opacity 1.4s ease; animation: countdown-stars-drift 24s linear infinite; }
+.countdown-theme-night .countdown-stars { opacity: 0.72; }
+.countdown-sun { position: absolute; right: 8vw; top: 7vh; width: clamp(5rem, 11vw, 9rem); aspect-ratio: 1; border-radius: 999px; background: rgb(255 239 179 / 88%); box-shadow: 0 0 5rem rgb(255 213 128 / 55%); opacity: 0; transform: translateY(2rem) scale(0.8); transition: opacity 1.4s ease, transform 1.4s ease; }
+.countdown-theme-morning .countdown-sun, .countdown-theme-evening .countdown-sun { opacity: 0.75; transform: translateY(0) scale(1); }
+.countdown-theme-evening .countdown-sun { top: auto; bottom: 9vh; background: rgb(255 184 108 / 75%); box-shadow: 0 0 6rem rgb(255 121 80 / 62%); }
+.countdown-horizon { position: absolute; right: -8vw; bottom: -24vh; left: -8vw; height: 38vh; border-radius: 50% 50% 0 0; background: rgb(3 17 45 / 18%); transform: scaleX(1.15); }
 .countdown-grid {
   position: absolute;
   inset: 0;
@@ -136,10 +155,14 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   mask-image: linear-gradient(to bottom, black, transparent 80%);
   animation: countdown-grid-drift 18s linear infinite;
 }
-.countdown-ring { position: absolute; border-radius: 999px; border: 2px solid rgb(103 232 249 / 18%); box-shadow: 0 0 80px rgb(34 211 238 / 10%); }
+.countdown-ring { position: absolute; border-radius: 999px; border: 2px solid var(--countdown-ring); box-shadow: 0 0 80px color-mix(in srgb, var(--countdown-glow) 30%, transparent); transition: border-color 1.4s ease, box-shadow 1.4s ease; }
 .countdown-ring-one { top: -22vw; left: 26vw; width: 48vw; height: 48vw; animation: countdown-ring-pulse 6s ease-in-out infinite; }
 .countdown-ring-two { right: -13vw; bottom: -20vw; width: 42vw; height: 42vw; animation: countdown-ring-pulse 7.5s ease-in-out 1s infinite reverse; }
 .countdown-number { animation: countdown-number-pulse 2.6s ease-in-out infinite; will-change: transform, filter; }
+.countdown-stage .countdown-number { filter: drop-shadow(0 0 1.5rem var(--countdown-glow)); }
+.countdown-stage .text-cyan-200, .countdown-stage .text-blue-100 { color: var(--countdown-soft); }
+.countdown-time-label { position: absolute; right: clamp(1.25rem, 3vw, 3rem); bottom: clamp(1rem, 2.5vh, 2rem); z-index: 20; display: flex; align-items: center; gap: 0.65rem; border: 1px solid rgb(255 255 255 / 18%); border-radius: 999px; background: rgb(2 6 23 / 30%); padding: 0.6rem 0.9rem; color: var(--countdown-soft); font-size: clamp(0.7rem, 1.3vw, 0.95rem); font-weight: 900; letter-spacing: 0.14em; backdrop-filter: blur(12px); }
+.countdown-time-label span { width: 0.55rem; height: 0.55rem; border-radius: 999px; background: var(--countdown-accent); box-shadow: 0 0 1rem var(--countdown-accent); animation: countdown-status-pulse 2s ease-in-out infinite; }
 
 @keyframes mode-arrive {
   from { opacity: 0; transform: scale(1.025); filter: blur(8px); }
@@ -177,13 +200,21 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   from { background-position: 0 0, 0 0; }
   to { background-position: 56px 56px, 56px 56px; }
 }
+@keyframes countdown-stars-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(-40px, 28px, 0); }
+}
 @keyframes countdown-ring-pulse {
   0%, 100% { opacity: 0.45; transform: scale(0.95); }
   50% { opacity: 1; transform: scale(1.08); }
 }
 @keyframes countdown-number-pulse {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgb(103 232 249 / 0%)); }
-  50% { transform: scale(1.025); filter: drop-shadow(0 0 1.5rem rgb(103 232 249 / 38%)); }
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 transparent); }
+  50% { transform: scale(1.025); filter: drop-shadow(0 0 1.5rem var(--countdown-glow)); }
+}
+@keyframes countdown-status-pulse {
+  0%, 100% { opacity: 0.65; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
 }
 
 .admin-card { border: 1px solid #e2e8f0; background: white; padding: clamp(1.25rem, 3vw, 2rem); box-shadow: 0 8px 28px rgb(15 23 42 / 6%); }

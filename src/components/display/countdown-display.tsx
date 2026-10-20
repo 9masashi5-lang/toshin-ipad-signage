@@ -1,8 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { calculateRemainingDays } from "@/lib/countdown";
+import { calculateRemainingDays, getTokyoTimePeriod, type TokyoTimePeriod } from "@/lib/countdown";
 import type { CountdownContent } from "@/types/signage";
+
+const timePeriodSettings: Record<TokyoTimePeriod, { className: string; label: string }> = {
+  morning: { className: "countdown-theme-morning", label: "MORNING FOCUS" },
+  day: { className: "countdown-theme-day", label: "DAYTIME CHALLENGE" },
+  evening: { className: "countdown-theme-evening", label: "EVENING BOOST" },
+  night: { className: "countdown-theme-night", label: "NIGHT MISSION" },
+};
 
 export function CountdownDisplay({ countdown }: { countdown: CountdownContent }) {
   const [now, setNow] = useState(() => new Date());
@@ -13,9 +20,15 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
 
   const days = calculateRemainingDays(countdown.targetDate, now);
   const dayLabel = days === null ? "—" : Math.max(days, 0).toLocaleString("ja-JP");
+  const timePeriod = getTokyoTimePeriod(now);
+  const theme = timePeriodSettings[timePeriod];
 
   return (
-    <section className="signage-stage countdown-stage" aria-label="カウントダウン">
+    <section className={`signage-stage countdown-stage ${theme.className}`} aria-label="カウントダウン">
+      <div className="countdown-atmosphere" aria-hidden="true" />
+      <div className="countdown-stars" aria-hidden="true" />
+      <div className="countdown-sun" aria-hidden="true" />
+      <div className="countdown-horizon" aria-hidden="true" />
       <div className="countdown-grid" aria-hidden="true" />
       <div className="countdown-ring countdown-ring-one" aria-hidden="true" />
       <div className="countdown-ring countdown-ring-two" aria-hidden="true" />
@@ -37,6 +50,10 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
           {countdown.message}
         </p>
       </div>
+      <p className="countdown-time-label" aria-label={`現在の時間帯テーマ: ${theme.label}`}>
+        <span aria-hidden="true" />
+        {theme.label}
+      </p>
     </section>
   );
 }

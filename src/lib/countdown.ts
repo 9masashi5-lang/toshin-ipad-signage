@@ -1,5 +1,23 @@
 const TOKYO_TIME_ZONE = "Asia/Tokyo";
 
+export type TokyoTimePeriod = "morning" | "day" | "evening" | "night";
+
+export function getTokyoTimePeriod(now = new Date()): TokyoTimePeriod {
+  const hourPart = new Intl.DateTimeFormat("en-US", {
+    timeZone: TOKYO_TIME_ZONE,
+    hour: "2-digit",
+    hourCycle: "h23",
+  })
+    .formatToParts(now)
+    .find((part) => part.type === "hour");
+  const hour = Number(hourPart?.value ?? 0);
+
+  if (hour >= 5 && hour < 10) return "morning";
+  if (hour >= 10 && hour < 16) return "day";
+  if (hour >= 16 && hour < 19) return "evening";
+  return "night";
+}
+
 function getTokyoDateKey(now: Date) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: TOKYO_TIME_ZONE,
