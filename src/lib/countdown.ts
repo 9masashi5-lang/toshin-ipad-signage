@@ -1,6 +1,7 @@
 const TOKYO_TIME_ZONE = "Asia/Tokyo";
 
 export type TokyoTimePeriod = "morning" | "day" | "evening" | "night";
+export type TokyoSeason = "spring" | "summer" | "autumn" | "winter";
 
 export function getTokyoTimePeriod(now = new Date()): TokyoTimePeriod {
   const hourPart = new Intl.DateTimeFormat("en-US", {
@@ -16,6 +17,21 @@ export function getTokyoTimePeriod(now = new Date()): TokyoTimePeriod {
   if (hour >= 10 && hour < 16) return "day";
   if (hour >= 16 && hour < 19) return "evening";
   return "night";
+}
+
+export function getTokyoSeason(now = new Date()): TokyoSeason {
+  const monthPart = new Intl.DateTimeFormat("en-US", {
+    timeZone: TOKYO_TIME_ZONE,
+    month: "numeric",
+  })
+    .formatToParts(now)
+    .find((part) => part.type === "month");
+  const month = Number(monthPart?.value ?? 1);
+
+  if (month >= 3 && month <= 5) return "spring";
+  if (month >= 6 && month <= 8) return "summer";
+  if (month >= 9 && month <= 11) return "autumn";
+  return "winter";
 }
 
 function getTokyoDateKey(now: Date) {

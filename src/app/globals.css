@@ -146,6 +146,31 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 .countdown-theme-morning .countdown-sun, .countdown-theme-evening .countdown-sun { opacity: 0.75; transform: translateY(0) scale(1); }
 .countdown-theme-evening .countdown-sun { top: auto; bottom: 9vh; background: rgb(255 184 108 / 75%); box-shadow: 0 0 6rem rgb(255 121 80 / 62%); }
 .countdown-horizon { position: absolute; right: -8vw; bottom: -24vh; left: -8vw; height: 38vh; border-radius: 50% 50% 0 0; background: rgb(3 17 45 / 18%); transform: scaleX(1.15); }
+.countdown-season-wash { position: absolute; inset: 0; opacity: 0.52; transition: background 1.4s ease; }
+.countdown-season-spring .countdown-season-wash { background: radial-gradient(circle at 10% 15%, rgb(251 207 232 / 34%), transparent 30%), radial-gradient(circle at 88% 80%, rgb(244 114 182 / 18%), transparent 35%); }
+.countdown-season-summer .countdown-season-wash { background: radial-gradient(circle at 12% 80%, rgb(74 222 128 / 20%), transparent 30%), radial-gradient(circle at 88% 18%, rgb(250 204 21 / 16%), transparent 32%); }
+.countdown-season-autumn .countdown-season-wash { background: radial-gradient(circle at 12% 18%, rgb(251 146 60 / 30%), transparent 33%), radial-gradient(circle at 90% 78%, rgb(127 29 29 / 25%), transparent 38%); }
+.countdown-season-winter .countdown-season-wash { background: radial-gradient(circle at 12% 18%, rgb(224 242 254 / 27%), transparent 33%), radial-gradient(circle at 90% 80%, rgb(147 197 253 / 20%), transparent 38%); }
+.countdown-season-particles { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+.countdown-season-particles span { position: absolute; top: -8vh; opacity: 0; will-change: transform; }
+.countdown-season-spring .countdown-season-particles span { width: clamp(0.7rem, 1.2vw, 1.1rem); height: clamp(0.45rem, 0.8vw, 0.75rem); border-radius: 100% 0 100% 0; background: linear-gradient(135deg, #fff1f2, #f9a8d4); box-shadow: 0 0 1rem rgb(251 207 232 / 45%); animation: countdown-season-fall 12s linear infinite; }
+.countdown-season-autumn .countdown-season-particles span { width: clamp(0.75rem, 1.3vw, 1.2rem); height: clamp(0.75rem, 1.3vw, 1.2rem); border-radius: 80% 0 80% 20%; background: linear-gradient(135deg, #fde047, #ea580c 65%, #991b1b); box-shadow: 0 0 1rem rgb(251 146 60 / 30%); animation: countdown-season-fall 14s linear infinite; }
+.countdown-season-winter .countdown-season-particles span { width: clamp(0.25rem, 0.65vw, 0.55rem); height: clamp(0.25rem, 0.65vw, 0.55rem); border-radius: 999px; background: white; box-shadow: 0 0 0.8rem rgb(224 242 254 / 80%); animation: countdown-snow-fall 11s linear infinite; }
+.countdown-season-summer .countdown-season-particles span { top: auto; bottom: 8%; width: clamp(0.3rem, 0.7vw, 0.6rem); height: clamp(0.3rem, 0.7vw, 0.6rem); border-radius: 999px; background: #fef08a; box-shadow: 0 0 1.2rem 0.35rem rgb(190 242 100 / 55%); animation: countdown-summer-light 7s ease-in-out infinite; }
+.countdown-season-particles span:nth-child(1) { left: 4%; animation-delay: -2s; animation-duration: 10s; }
+.countdown-season-particles span:nth-child(2) { left: 11%; animation-delay: -7s; animation-duration: 14s; }
+.countdown-season-particles span:nth-child(3) { left: 19%; animation-delay: -4s; animation-duration: 12s; }
+.countdown-season-particles span:nth-child(4) { left: 27%; animation-delay: -10s; animation-duration: 16s; }
+.countdown-season-particles span:nth-child(5) { left: 35%; animation-delay: -1s; animation-duration: 11s; }
+.countdown-season-particles span:nth-child(6) { left: 43%; animation-delay: -8s; animation-duration: 15s; }
+.countdown-season-particles span:nth-child(7) { left: 51%; animation-delay: -5s; animation-duration: 13s; }
+.countdown-season-particles span:nth-child(8) { left: 59%; animation-delay: -12s; animation-duration: 17s; }
+.countdown-season-particles span:nth-child(9) { left: 67%; animation-delay: -3s; animation-duration: 12s; }
+.countdown-season-particles span:nth-child(10) { left: 74%; animation-delay: -9s; animation-duration: 15s; }
+.countdown-season-particles span:nth-child(11) { left: 81%; animation-delay: -6s; animation-duration: 13s; }
+.countdown-season-particles span:nth-child(12) { left: 88%; animation-delay: -11s; animation-duration: 16s; }
+.countdown-season-particles span:nth-child(13) { left: 94%; animation-delay: -4s; animation-duration: 14s; }
+.countdown-season-particles span:nth-child(14) { left: 98%; animation-delay: -8s; animation-duration: 18s; }
 .countdown-grid {
   position: absolute;
   inset: 0;
@@ -215,6 +240,22 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
 @keyframes countdown-stars-drift {
   from { transform: translate3d(0, 0, 0); }
   to { transform: translate3d(-40px, 28px, 0); }
+}
+@keyframes countdown-season-fall {
+  0% { opacity: 0; transform: translate3d(0, -8vh, 0) rotate(0deg); }
+  12% { opacity: 0.72; }
+  75% { opacity: 0.58; }
+  100% { opacity: 0; transform: translate3d(8vw, 116vh, 0) rotate(520deg); }
+}
+@keyframes countdown-snow-fall {
+  0% { opacity: 0; transform: translate3d(0, -8vh, 0) scale(0.65); }
+  14% { opacity: 0.85; }
+  100% { opacity: 0; transform: translate3d(4vw, 116vh, 0) scale(1.1); }
+}
+@keyframes countdown-summer-light {
+  0%, 100% { opacity: 0.12; transform: translate3d(-1vw, 0, 0) scale(0.7); }
+  35% { opacity: 0.85; transform: translate3d(2vw, -22vh, 0) scale(1.15); }
+  70% { opacity: 0.35; transform: translate3d(-2vw, -42vh, 0) scale(0.85); }
 }
 @keyframes countdown-ring-pulse {
   0%, 100% { opacity: 0.45; transform: scale(0.95); }

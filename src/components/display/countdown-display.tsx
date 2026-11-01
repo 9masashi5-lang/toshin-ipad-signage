@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { calculateRemainingDays, getTokyoTimePeriod, type TokyoTimePeriod } from "@/lib/countdown";
+import {
+  calculateRemainingDays,
+  getTokyoSeason,
+  getTokyoTimePeriod,
+  type TokyoSeason,
+  type TokyoTimePeriod,
+} from "@/lib/countdown";
 import type { CountdownContent } from "@/types/signage";
 
 const timePeriodSettings: Record<TokyoTimePeriod, { className: string; label: string }> = {
@@ -10,6 +16,15 @@ const timePeriodSettings: Record<TokyoTimePeriod, { className: string; label: st
   evening: { className: "countdown-theme-evening", label: "EVENING BOOST" },
   night: { className: "countdown-theme-night", label: "NIGHT MISSION" },
 };
+
+const seasonSettings: Record<TokyoSeason, { className: string; label: string; japaneseLabel: string }> = {
+  spring: { className: "countdown-season-spring", label: "SPRING", japaneseLabel: "春" },
+  summer: { className: "countdown-season-summer", label: "SUMMER", japaneseLabel: "夏" },
+  autumn: { className: "countdown-season-autumn", label: "AUTUMN", japaneseLabel: "秋" },
+  winter: { className: "countdown-season-winter", label: "WINTER", japaneseLabel: "冬" },
+};
+
+const seasonalParticleIds = Array.from({ length: 14 }, (_, index) => index);
 
 type HiddenEvent = {
   kind: "milestone" | "rare";
@@ -46,6 +61,8 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
   const dayLabel = days === null ? "—" : Math.max(days, 0).toLocaleString("ja-JP");
   const timePeriod = getTokyoTimePeriod(now);
   const theme = timePeriodSettings[timePeriod];
+  const season = getTokyoSeason(now);
+  const seasonTheme = seasonSettings[season];
 
   useEffect(() => {
     if (!countdown.hiddenEventsEnabled) return;
@@ -88,11 +105,18 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
   const visibleHiddenEvent = countdown.hiddenEventsEnabled ? hiddenEvent : null;
 
   return (
-    <section className={`signage-stage countdown-stage ${theme.className}`} aria-label="カウントダウン">
+    <section
+      className={`signage-stage countdown-stage ${theme.className} ${seasonTheme.className}`}
+      aria-label="カウントダウン"
+    >
       <div className="countdown-atmosphere" aria-hidden="true" />
       <div className="countdown-stars" aria-hidden="true" />
       <div className="countdown-sun" aria-hidden="true" />
       <div className="countdown-horizon" aria-hidden="true" />
+      <div className="countdown-season-wash" aria-hidden="true" />
+      <div className="countdown-season-particles" aria-hidden="true">
+        {seasonalParticleIds.map((particleId) => <span key={particleId} />)}
+      </div>
       <div className="countdown-grid" aria-hidden="true" />
       <div className="countdown-ring countdown-ring-one" aria-hidden="true" />
       <div className="countdown-ring countdown-ring-two" aria-hidden="true" />
@@ -114,9 +138,12 @@ export function CountdownDisplay({ countdown }: { countdown: CountdownContent })
           {countdown.message}
         </p>
       </div>
-      <p className="countdown-time-label" aria-label={`現在の時間帯テーマ: ${theme.label}`}>
+      <p
+        className="countdown-time-label"
+        aria-label={`現在のテーマ: ${seasonTheme.japaneseLabel}、${theme.label}`}
+      >
         <span aria-hidden="true" />
-        {theme.label}
+        {seasonTheme.label} · {theme.label}
       </p>
       {visibleHiddenEvent ? (
         <div
